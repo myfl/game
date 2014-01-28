@@ -6,13 +6,21 @@ public class Game {
 
     private static final String PLAYER2_NAME = "Player2";
 
+    private static final String HORIZONTAL_AXIS_NAME = "OX";
+
+    private static final String VERTICAL_AXIS_NAME = "OY";
+
     private static final int PLAYER1 = 1;
 
     private static final int PLAYER2 = 2;
 
+    private static final char PLAYER1_ICON = 'x';
+
+    private static final char PLAYER2_ICON = 'o';
+
     private int nowPlays = PLAYER1;
 
-    private boolean endGame = true;
+    private boolean endGame = false;
 
     Grid grid = new Grid();
 
@@ -25,59 +33,153 @@ public class Game {
 
     private void play(){
         do {
-            whoPlay();
+
+           System.out.println(whoPlaysNow() + " ваш ход:");
             Coordinates();
             grid.showField();
-            //endGame = false;
+            if(checkWin()) {
+               endGame =  true;
+               System.out.println("Выйграл " + whoPlaysNow() + "!!!");
+            }
 
         }
-        while (endGame);
+        while (!endGame);
+    }
+
+
+    private boolean checkWin() {
+        int counter = 0;
+
+        if((grid.getCell(0,0)==PLAYER1_ICON && grid.getCell(1,1)==PLAYER1_ICON && grid.getCell(2,2)==PLAYER1_ICON) || (grid.getCell(2,0)==PLAYER1_ICON && grid.getCell(1,1)==PLAYER1_ICON && grid.getCell(0,2)==PLAYER1_ICON))
+            return true;
+
+        if((grid.getCell(0,0)==PLAYER2_ICON && grid.getCell(1,1)==PLAYER2_ICON && grid.getCell(2,2)==PLAYER2_ICON) || (grid.getCell(2,0)==PLAYER2_ICON && grid.getCell(1,1)==PLAYER2_ICON && grid.getCell(0,2)==PLAYER2_ICON))
+            return true;
+
+        if(nowPlays == PLAYER1){
+
+            for(int x = 0; x < grid.FIELD_SIZE; x++){
+                for (int y = 0; y < grid.FIELD_SIZE; y++) {
+                    if(grid.getCell(x,y) == PLAYER1_ICON) {
+                       counter++;
+                       if(counter == grid.FIELD_SIZE) {
+                           return true;
+                       }
+                    }
+                }
+            }
+
+            counter = 0;
+
+            for(int x = 0; x < grid.FIELD_SIZE; x++){
+                for (int y = 0; y < grid.FIELD_SIZE; y++) {
+                    if(grid.getCell(y,x) == PLAYER1_ICON) {
+                        counter++;
+                        if(counter == grid.FIELD_SIZE) {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+
+        }
+
+        else{
+            counter = 0;
+
+            for(int x = 0; x < grid.FIELD_SIZE; x++){
+                for (int y = 0; y < grid.FIELD_SIZE; y++) {
+                    if(grid.getCell(x,y) == PLAYER2_ICON) {
+                        counter++;
+                        if(counter == grid.FIELD_SIZE) {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            counter = 0;
+
+            for(int x = 0; x < grid.FIELD_SIZE; x++){
+                for (int y = 0; y < grid.FIELD_SIZE; y++) {
+                    if(grid.getCell(y,x) == PLAYER1_ICON) {
+                        counter++;
+                        if(counter == grid.FIELD_SIZE) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+
     }
 
     private void Coordinates(){
-        int ox = 0;
-        int oy = 0;
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Введите значение по оси Ox: ");
-        if(sc.hasNextInt()) { // возвращает истинну если с потока ввода можно считать целое число
-            ox = sc.nextInt(); // считывает целое число с потока ввода и сохраняем в переменную
-        }
-        else {
-        System.out.println("Вы ввели неверное значение");
-        }
 
+        int x = 0;
+        int y = 0;
 
-        System.out.println("Введите значение по оси Oy");
-        if(sc.hasNextInt()) { // возвращает истинну если с потока ввода можно считать целое число
-            oy = sc.nextInt(); // считывает целое число с потока ввода и сохраняем в переменную
+        do{
+            x = enterValue(HORIZONTAL_AXIS_NAME);
+            y = enterValue(VERTICAL_AXIS_NAME);
         }
-        else {
-            System.out.println("Вы ввели неверное значение");
-        }
+        while(!grid.checkPlace(x,y));
 
-        grid.setCell(ox, oy, icon());
+        grid.setCell(x, y, icon());
 
         nowPlays = nowPlays == PLAYER1 ? PLAYER2 : PLAYER1;
     }
 
-    private char icon(){
-        if(nowPlays == 1)
-            return 'o';
-        return 'x';
+    private int enterValue(String axis){
 
+        int coordinate = 0;
+        boolean error = false;
 
+        do{
+            Scanner sc = new Scanner(System.in);
+            System.out.println("Введите значение по оси " + axis + ":");
+
+            if(sc.hasNextInt()) { //sc.hasNextInt() возвращает истинну если с потока ввода можно считать целое число
+                coordinate = sc.nextInt(); // считывает целое число с потока ввода и сохраняем в переменную
+                if(validate(coordinate))
+                error = true;
+
+            }
+            else {
+                System.out.println("Вы ввели неверное значение!!!");
+
+            }
+        }
+        while(!error);
+
+        return coordinate;
     }
 
-    private void whoPlay(){
-        if(nowPlays == 1) {
-            System.out.println(PLAYER1_NAME + " ваш ход");
+    private boolean validate(int coordinate){
+        if(coordinate >= 0 && coordinate < grid.FIELD_SIZE) {
+            return true;
         }
-        else {
-            System.out.println(PLAYER2_NAME + " ваш ход");
+        return false;
+    }
+
+    private char icon(){
+        if(nowPlays == PLAYER1)
+            return PLAYER1_ICON;
+        return PLAYER2_ICON;
+    }
+
+    private String whoPlaysNow(){
+        if(nowPlays == PLAYER1) {
+            return PLAYER1_NAME;
         }
+        return PLAYER2_NAME;
     }
 
     private void start(){
+
         System.out.println("***Игра крестики нолики!!!***");
         System.out.println("[FAQ]");
         System.out.println("- Для игры вводите сначало координаты по оси OX, затем OY");

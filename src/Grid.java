@@ -1,6 +1,6 @@
 public class Grid {
     
-    private static final int FIELD_SIZE = 3;
+    public final int FIELD_SIZE = 3;
 
     private static final int DEFAULT_CELL_VALUE = ' ';
 
@@ -12,8 +12,21 @@ public class Grid {
         }
     }
 
-    public void setCell(int x, int y, char enter){
+    public void setCell(int x, int y, char enter) {
         field[x][y] = enter;
+    }
+
+
+
+    public boolean checkPlace(int x, int y) {
+       if(field[x][y] == DEFAULT_CELL_VALUE) {
+           return true;
+       }
+       return false;
+    }
+
+    public char getCell(int x, int y){
+        return field[x][y];
     }
 
     private void eraseLine(int lineNumber) {
